@@ -1,17 +1,17 @@
-# status_server.py
+# combined_raspberry_pi_webserver.py
+
 import json
 import psutil
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 PORT = 8080
 
-class PiStatusHandler(SimpleHTTPRequestHandler):
+class PiWebHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/status.json":
             cpu = psutil.cpu_percent(interval=1)
             ram = psutil.virtual_memory().percent
             try:
-                # Temperatur auslesen (Linux, Raspberry Pi)
                 with open("/sys/class/thermal/thermal_zone0/temp") as f:
                     temp = int(f.read()) / 1000
             except:
@@ -22,9 +22,20 @@ class PiStatusHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(status).encode())
-        else:
-            super().do_GET()  # andere Dateien normal ausliefern
 
-server = HTTPServer(("", PORT), PiStatusHandler)
-print(f"Server läuft auf Port {PORT}")
-server.serve_forever()
+        elif self.path == "/" or self.path == "/index.html":
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            with open("index.html", "rb") as f:
+                self.wfile.write(f.read())
+
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b"404 Not Found")
+
+if __name__ == "__main__":
+    server = HTTPServer(("", PORT), PiWebHandler)
+    print(f"Webserver läuft auf Port {PORT}")
+    server.serve_forever()
