@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+
+    .card h2 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #00e0ff;
+      color: black;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px #00e0ff;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+    }
+
+    .sensor-data {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 15px;
+    }
+  </style>
+  <script>
+    async function fetchPiStatus() {
+      try {
+        const response = await fetch('/status.json');
+        if (!response.ok) throw new Error('Netzwerkfehler');
+        const data = await response.json();
+        document.getElementById('cpu').textContent = data.cpu + '%';
+        document.getElementById('ram').textContent = data.ram + '%';
+        document.getElementById('temp').textContent = data.temp + '°C';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    setInterval(fetchPiStatus, 5000);
+    window.onload = fetchPiStatus;
+  </script>
+</head>
+<body>
+  <header>
+    <h1>🚀 Raspberry Pi Webserver</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#about">About</a>
+      <a href="#contact">Kontakt</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Dein Server läuft!</h2>
+      <p>Diese Website wird direkt von deinem Raspberry Pi 5 ausgeliefert.</p>
+      <a class="btn" href="#about">Mehr erfahren</a>
+    </div>
+
+    <div class="card sensor-data">
+      <h2>Raspberry Pi Status</h2>
+      <p>CPU: <span id="cpu">--</span></p>
+      <p>RAM: <span id="ram">--</span></p>
+      <p>Temperatur: <span id="temp">--</span></p>
+    </div>
+  </main>
+
+  <footer>
+    © 2026 Raspberry Pi Server
+  </footer>
+</body>
+</html>
